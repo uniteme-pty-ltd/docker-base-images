@@ -1,125 +1,34 @@
-name: Build and push to ECR
-# on:
-#   release:
-#     types:
-#       - created
 on:
   push:
-    branches:
-      - main
-
-env:
-  ECR_REGISTRY: public.ecr.aws/a7w5m6n7
-  AWS_REGION: ap-southeast-2
+    branches: [main]
 
 jobs:
-  build-and-push:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_ SECRET_KEY }}
+          aws-region: ap-southeast-2
 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push the image to Amazon ECR
-        id: rust-build
         env:
-          ECR_REGISTRY: ${{ env.ECR_REGISTRY }}
-          ECR_REPOSITORY: rust-build
-          IMAGE_TAG: ${{ github.sha }}
+          ECR_REGISTRY: public.ecr.aws/a7w5m6n7
+          IMAGE_NAME: rust-build
+          IMAGE_TAG: latest
         run: |
           # Build a docker container and push it to ECR 
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./rust-build
+          docker build -t $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG ./$IMAGE_NAME
           echo "Pushing image to ECR..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      # - name: Build, tag, and push rust-build to Amazon ECR
-      #   env:
-      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     IMAGE: rust-build
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker build -t $REGISTRY/$IMAGE:$IMAGE_TAG ./$IMAGE
-      #     docker push $REGISTRY/$IMAGE:$IMAGE_TAG
-
-      # - name: Build, tag, and push rust-final to Amazon ECR
-      #   env:
-      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     IMAGE: rust-final
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker build -t $REGISTRY/$IMAGE:$IMAGE_TAG ./$IMAGE
-      #     docker push $REGISTRY/$IMAGE:$IMAGE_TAG
-
-      # - name: Build, tag, and push rust-final-db to Amazon ECR
-      #   env:
-      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     IMAGE: rust-final-db
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker build -t $REGISTRY/$IMAGE:$IMAGE_TAG ./$IMAGE
-      #     docker push $REGISTRY/$IMAGE:$IMAGE_TAG
-
-      # - name: Build and Push rust-final-db image
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     context: ./rust-final-db
-      #     push: true
-      #     tags: ${{ env.ECR_REGISTRY }}/rust-final-db:${{ github.sha }}
-
-# name: Build and Push rust-build to ECR
-# # on:
-# #   release:
-# #     types:
-# #       - created
-# on:
-#   push:
-#     branches:
-#       - main
-
-# env:
-#   ECR_REGISTRY: public.ecr.aws/a7w5m6n7
-#   IMAGE_NAME: rust-build
-#   AWS_REGION: ap-southeast-2
-
-# jobs:
-#   build-and-push:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v1
-#         with:
-#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
-#           aws-region: ${{ env.AWS_REGION }}
-
-#       - name: Login to Amazon ECR
-#         id: login-ecr
-#         uses: aws-actions/amazon-ecr-login@v1
-
-#       - name: Build and tag Docker image
-#         id: build-image
-#         run: |
-#           docker build -t $ECR_REGISTRY/$IMAGE_NAME:$GITHUB_SHA ./$IMAGE_NAME
-#           echo "::set-output name=image::$ECR_REGISTRY/$IMAGE_NAME:$GITHUB_SHA"
-
-#       - name: Push Docker image to Amazon ECR
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: ./rust-build
-#           push: true
-#           tags: ${{ steps.build-image.outputs.image }}
+          docker push $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
