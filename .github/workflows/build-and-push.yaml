@@ -31,26 +31,40 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and Push rust-build image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./rust-build
-          push: true
-          tags: ${{ env.ECR_REGISTRY }}/rust-build:${{ github.sha }}
+      - name: Build, tag, and push rust-build to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE: rust-build
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$IMAGE:$IMAGE_TAG .
+          docker push $REGISTRY/$IMAGE:$IMAGE_TAG
 
-      - name: Build and Push rust-final image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./rust-final
-          push: true
-          tags: ${{ env.ECR_REGISTRY }}/rust-final:${{ github.sha }}
+      - name: Build, tag, and push rust-final to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE: rust-final
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$IMAGE:$IMAGE_TAG .
+          docker push $REGISTRY/$IMAGE:$IMAGE_TAG
 
-      - name: Build and Push rust-final-db image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./rust-final-db
-          push: true
-          tags: ${{ env.ECR_REGISTRY }}/rust-final-db:${{ github.sha }}
+      - name: Build, tag, and push rust-final-db to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE: rust-final-db
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$IMAGE:$IMAGE_TAG .
+          docker push $REGISTRY/$IMAGE:$IMAGE_TAG
+
+      # - name: Build and Push rust-final-db image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: ./rust-final-db
+      #     push: true
+      #     tags: ${{ env.ECR_REGISTRY }}/rust-final-db:${{ github.sha }}
+
 # name: Build and Push rust-build to ECR
 # # on:
 # #   release:
