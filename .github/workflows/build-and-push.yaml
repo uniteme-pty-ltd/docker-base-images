@@ -32,21 +32,21 @@ jobs:
         with:
           context: ./rust-build
           push: true
-          tags: $ECR_REGISTRY/rust-build:$GITHUB_SHA
+          tags: ${{ env.ECR_REGISTRY }}/rust-build:${{ $GITHUB_SHA }}
 
       - name: Build and Push rust-final image
         uses: docker/build-push-action@v2
         with:
           context: ./rust-final
           push: true
-          tags: $ECR_REGISTRY/rust-final:$GITHUB_SHA
+          tags: ${{ env.ECR_REGISTRY }}/rust-final:${{ $GITHUB_SHA }}
 
       - name: Build and Push rust-final-db image
         uses: docker/build-push-action@v2
         with:
           context: ./rust-final-db
           push: true
-          tags: $ECR_REGISTRY/rust-final-db:$GITHUB_SHA
+          tags: ${{ env.ECR_REGISTRY }}/rust-final-db:${{ $GITHUB_SHA }}
 # name: Build and Push rust-build to ECR
 # # on:
 # #   release:
