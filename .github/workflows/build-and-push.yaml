@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ap-southeast-2
           aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
@@ -27,7 +27,6 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
         with:
           registry-type: public
-          aws-region: ap-southeast-2
 
       - name: Build, tag, and push docker image to Amazon ECR Public
         env:
