@@ -20,17 +20,15 @@ jobs:
           aws-region: ap-southeast-2
           aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
-          # role-to-assume: arn:aws:iam::333732284581:role/AmazonEC2ContainerRegistryPowerUser
+          role-to-assume: arn:aws:iam::333732284581:role/AmazonEC2ContainerRegistryPowerUser
 
-      - name: Login to Amazon ECR Public
-        id: login-ecr-public
+      - name: Login to Amazon ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry-type: public
 
       - name: Build, tag, and push docker image to Amazon ECR Public
         env:
-          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REGISTRY_ALIAS: a7w5m6n7
           REPOSITORY: rust-build
           IMAGE_TAG: ${{ github.sha }}
