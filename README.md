@@ -1,5 +1,7 @@
 # Base Docker images
 
+dummy commit
+
 Base Docker images to prevent needless recompilation.
 
 These images are built and uploaded to AWS ECR on every commit to `main` and when a new release is created.
