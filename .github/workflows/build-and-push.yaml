@@ -1,44 +1,4 @@
-# name: Build and push to ECR
-
-# on:
-#   push:
-#     branches:
-#       - main
-
-# jobs:
-#   deploy:
-#     name: Deploy
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v2
-#         with:
-#           aws-region: ap-southeast-2
-#           aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
-#           role-to-assume: arn:aws:iam::333732284581:role/AmazonEC2ContainerRegistryPowerUser
-
-#       - name: Login to Amazon ECR Public
-#         id: login-ecr-public
-#         uses: aws-actions/amazon-ecr-login@v1
-#         with:
-#           registry-type: public
-
-#       - name: Build, tag, and push docker image to Amazon ECR Public
-#         env:
-#           REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-#           REGISTRY_ALIAS: a7w5m6n7
-#           REPOSITORY: rust-build
-#           IMAGE_TAG: ${{ github.sha }}
-#         run: |
-#           docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG ./$REPOSITORY
-#           docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
-
-name: Deploy to ECR
+name: Publish merge hash image to ECR
 
 on:
   push:
@@ -63,10 +23,13 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
 
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY_ALIAS: a7w5m6n7
           ECR_REPOSITORY: rust-build
           IMAGE_TAG: ${{ github.sha }}
         run: |
