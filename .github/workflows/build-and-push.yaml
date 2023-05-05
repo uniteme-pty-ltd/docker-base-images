@@ -8,7 +8,6 @@ jobs:
   build:
     name: Build Image
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -23,16 +22,12 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry-type: public
 
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REGISTRY_ALIAS: a7w5m6n7
           ECR_REPOSITORY: rust-build
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          cd $ECR_REPOSITORY
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./$ECR_REPOSITORY
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
