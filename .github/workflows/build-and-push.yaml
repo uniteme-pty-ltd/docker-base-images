@@ -1,5 +1,4 @@
 name: Publish image to ECR
-
 on:
   push:
     branches: [main]
@@ -25,7 +24,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build and push image with commit hash tag
         if: github.ref == 'refs/heads/main'
         id: build-and-push-on-commit
         env:
@@ -36,7 +35,7 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./$ECR_REPOSITORY
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build and push image with new release tag
         if: github.event_name == 'release'
         id: build-and-push-new-release
         env:
