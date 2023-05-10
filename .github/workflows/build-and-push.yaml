@@ -24,7 +24,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push image with commit hash tag
+      - name: Build and push rust-build image with commit hash tag
         if: github.ref == 'refs/heads/main'
         id: build-and-push-on-commit
         env:
@@ -35,7 +35,7 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./$ECR_REPOSITORY
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Build and push image with new release tag
+      - name: Build and push rust-build image with new release tag
         if: github.event_name == 'release'
         id: build-and-push-new-release
         env:
@@ -45,4 +45,16 @@ jobs:
         run: |
           IMAGE_TAG=$(echo $GIT_REFERENCE | sed 's/refs\/tags\///') # Remove 'refs/tags/' prefix
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./$ECR_REPOSITORY
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build and push rust-final image with commit hash tag
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: rust-final
+          RUST_BUILD_TAG: ${{ steps.build-and-push-on-commit.outputs.IMAGE_TAG }}
+          GIT_REFERENCE: ${{ github.ref }}
+          # RUST_FINAL_TAG: ${{ steps.get-commit-hash.outputs.COMMIT_HASH }}
+        run: |
+          IMAGE_TAG=$(echo $GIT_REFERENCE | sed 's/refs\/tags\///') # Remove 'refs/tags/' prefix
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./$ECR_REPOSITORY --build-arg RUST_BUILD_TAG=$ECR_REGISTRY/$ECR_REPOSITORY:$RUST_BUILD_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
